@@ -6,7 +6,8 @@ const allowedOrigins = [
 	"http://127.0.0.1:3000",
 	"http://localhost:5173",
 	"http://127.0.0.1:5173",
-	process.env.CLIENT_URL || "https://your-vercel-app.vercel.app",
+	"https://clg-notes.netlify.app/",
+	process.env.CLIENT_URL || "https://clg-notes.netlify.app/",
 ];
 
 export const corsMiddleware = cors({
