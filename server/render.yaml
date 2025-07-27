@@ -1,0 +1,14 @@
+version: 1
+services:
+  - type: web
+    name: college-notes-server
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000

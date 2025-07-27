@@ -1,0 +1,31 @@
+# Server-specific ignores
+node_modules/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug and test files (server)
+test-db.js
+debug-*.js
+*.test.js
+*.spec.js
+
+# Logs (keep connection logs)
+*.log
+!*connection*.log
+!*db*.log
+!*aws*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads (if storing locally)
+uploads/
+temp-uploads/
+
+# Cache
+.cache/

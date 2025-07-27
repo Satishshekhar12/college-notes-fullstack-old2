@@ -1,0 +1,23 @@
+{
+	"name": "college-notes",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"dev": "concurrently \"npm run server\" \"npm run client\"",
+		"server": "cd server && npm start",
+		"client": "cd client && npm run dev",
+		"install-all": "npm install && cd client && npm install && cd ../server && npm install",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"description": "College Notes Upload System with React frontend and Express backend",
+	"devDependencies": {
+		"concurrently": "^8.2.0"
+	},
+	"dependencies": {
+		"cors": "^2.8.5"
+	}
+}
