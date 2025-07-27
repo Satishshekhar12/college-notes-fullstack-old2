@@ -20,6 +20,10 @@ export const signup = catchAsync(async (req, res, next) => {
 		password: req.body.password,
 		passwordConfirm: req.body.passwordConfirm,
 		role: req.body.role,
+		collegeName: req.body.collegeName,
+		course: req.body.course,
+		semester: req.body.semester,
+		studentType: req.body.studentType,
 	});
 
 	const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
@@ -296,4 +300,120 @@ export const updateMe = catchAsync(async (req, res, next) => {
 			user: updatedUser,
 		},
 	});
+});
+
+// Update user upload statistics
+export const updateUploadStats = catchAsync(async (req, res, next) => {
+	const { userId, type } = req.body; // type: 'upload', 'approve', 'reject'
+
+	if (!userId || !type) {
+		return next({
+			statusCode: 400,
+			message: "User ID and type are required",
+		});
+	}
+
+	const user = await User.findById(userId);
+	if (!user) {
+		return next({
+			statusCode: 404,
+			message: "User not found",
+		});
+	}
+
+	// Update statistics based on type
+	switch (type) {
+		case "upload":
+			user.totalUploads += 1;
+			break;
+		case "approve":
+			user.approvedUploads += 1;
+			break;
+		case "reject":
+			user.rejectedUploads += 1;
+			break;
+		default:
+			return next({
+				statusCode: 400,
+				message: "Invalid type. Use 'upload', 'approve', or 'reject'",
+			});
+	}
+
+	await user.save({ validateBeforeSave: false });
+
+	res.status(200).json({
+		status: "success",
+		data: {
+			user: {
+				id: user._id,
+				totalUploads: user.totalUploads,
+				approvedUploads: user.approvedUploads,
+				rejectedUploads: user.rejectedUploads,
+			},
+		},
+	});
+});
+
+// Get user profile with full details
+export const getUserProfile = catchAsync(async (req, res, next) => {
+	const user = await User.findById(req.user.id).select("-password");
+
+	if (!user) {
+		return next({
+			statusCode: 404,
+			message: "User not found",
+		});
+	}
+
+	res.status(200).json({
+		status: "success",
+		data: {
+			user,
+		},
+	});
+});
+
+// Sync user upload statistics for all users
+export const syncUserStats = catchAsync(async (req, res, next) => {
+	try {
+		const Note = (await import("../models/noteModel.js")).default;
+
+		const users = await User.find({});
+		let updatedCount = 0;
+
+		for (const user of users) {
+			const totalUploads = await Note.countDocuments({ uploadedBy: user._id });
+			const approvedUploads = await Note.countDocuments({
+				uploadedBy: user._id,
+				status: "approved",
+			});
+			const rejectedUploads = await Note.countDocuments({
+				uploadedBy: user._id,
+				status: "rejected",
+			});
+
+			await User.findByIdAndUpdate(user._id, {
+				totalUploads,
+				approvedUploads,
+				rejectedUploads,
+			});
+
+			console.log(
+				`✅ Synced stats for user ${user.name}: Total: ${totalUploads}, Approved: ${approvedUploads}, Rejected: ${rejectedUploads}`
+			);
+			updatedCount++;
+		}
+
+		res.status(200).json({
+			status: "success",
+			message: `Synced upload statistics for ${updatedCount} users`,
+			data: { updatedCount },
+		});
+	} catch (error) {
+		console.error("❌ Error syncing user stats:", error);
+		return next({
+			statusCode: 500,
+			message: "Failed to sync user statistics",
+		});
+	}
 });

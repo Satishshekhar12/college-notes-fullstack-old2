@@ -8,6 +8,9 @@ import {
 	updatePassword,
 	getMe,
 	updateMe,
+	updateUploadStats,
+	getUserProfile,
+	syncUserStats,
 } from "../controllers/authController.js";
 import { getAllUsers, getUser } from "../controllers/adminController.js";
 
@@ -27,11 +30,18 @@ router.patch("/updatePassword", protect, updatePassword);
 // User profile routes (protected)
 router.get("/me", protect, getMe);
 router.patch("/updateMe", protect, updateMe);
+router.get("/profile", protect, getUserProfile);
+
+// Update user upload statistics
+router.patch("/updateUploadStats", protect, updateUploadStats);
 
 // Get all users (admin route) - protected
 router.get("/users", protect, getAllUsers);
 // Get user by ID (admin route) - protected
 router.get("/users/:id", protect, getUser);
+
+// Sync user upload statistics (admin route)
+router.post("/sync-user-stats", protect, syncUserStats);
 
 // Welcome route
 router.get("/", (req, res) => {

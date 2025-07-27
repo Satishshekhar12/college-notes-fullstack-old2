@@ -8,6 +8,35 @@ import {
 } from "../config/aws.js";
 import multer from "multer";
 
+// Helper function to update user upload statistics
+const updateUserUploadStats = async (userId) => {
+	try {
+		// Count user's notes by status
+		const totalUploads = await Note.countDocuments({ uploadedBy: userId });
+		const approvedUploads = await Note.countDocuments({
+			uploadedBy: userId,
+			status: "approved",
+		});
+		const rejectedUploads = await Note.countDocuments({
+			uploadedBy: userId,
+			status: "rejected",
+		});
+
+		// Update user document
+		await User.findByIdAndUpdate(userId, {
+			totalUploads,
+			approvedUploads,
+			rejectedUploads,
+		});
+
+		console.log(
+			`✅ Updated stats for user ${userId}: Total: ${totalUploads}, Approved: ${approvedUploads}, Rejected: ${rejectedUploads}`
+		);
+	} catch (error) {
+		console.error("❌ Error updating user upload stats:", error);
+	}
+};
+
 // Configure multer for file upload (memory storage for S3 upload)
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -142,6 +171,9 @@ export const uploadNote = async (req, res) => {
 			subject: savedNote.subject,
 			s3Key: savedNote.file.s3Key,
 		});
+
+		// Update user upload statistics
+		await updateUserUploadStats(req.user.id);
 
 		// Populate user details for response
 		await savedNote.populate("uploadedBy", "name email");
@@ -489,6 +521,9 @@ export const approveNote = async (req, res) => {
 
 		await note.save();
 
+		// Update user upload statistics
+		await updateUserUploadStats(note.uploadedBy);
+
 		// Populate for response
 		await note.populate(["uploadedBy", "approvedBy"], "name email");
 
@@ -552,6 +587,9 @@ export const rejectNote = async (req, res) => {
 		});
 
 		await note.save();
+
+		// Update user upload statistics
+		await updateUserUploadStats(note.uploadedBy);
 
 		// Optional: Delete file from S3 to save storage costs
 		try {

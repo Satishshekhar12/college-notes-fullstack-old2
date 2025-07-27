@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema(
 			minlength: [8, "Password must be at least 8 characters long"],
 			select: false, // Ensures password is not returned in queries
 		},
-
 		passwordConfirm: {
 			type: String,
 			required: [true, "Please confirm your password"],
@@ -38,6 +37,39 @@ const userSchema = new mongoose.Schema(
 				},
 				message: "Passwords are not the same!",
 			},
+		},
+		// New academic profile fields
+		collegeName: {
+			type: String,
+			required: [true, "Please provide your college name"],
+		},
+		course: {
+			type: String,
+			required: [true, "Please provide your course"],
+		},
+		semester: {
+			type: Number,
+			required: [true, "Please provide your current semester"],
+			min: [1, "Semester must be at least 1"],
+			max: [12, "Semester cannot exceed 12"],
+		},
+		studentType: {
+			type: String,
+			enum: ["UG", "PG", "PhD"],
+			required: [true, "Please specify if you are UG/PG/PhD student"],
+		},
+		// Upload statistics
+		totalUploads: {
+			type: Number,
+			default: 0,
+		},
+		approvedUploads: {
+			type: Number,
+			default: 0,
+		},
+		rejectedUploads: {
+			type: Number,
+			default: 0,
 		},
 		passwordChangedAt: Date,
 		passwordResetToken: String,
