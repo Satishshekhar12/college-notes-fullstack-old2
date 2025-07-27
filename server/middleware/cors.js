@@ -13,6 +13,7 @@ const allowedOrigins = [
 
 export const corsMiddleware = cors({
 	origin: function (origin, callback) {
+		console.log("CORS Origin:", origin);
 		// Allow requests with no origin (like mobile apps or curl requests)
 		if (!origin) return callback(null, true);
 
