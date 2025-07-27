@@ -25,12 +25,12 @@ if (DB) {
 
 // Server configuration
 const PORT = process.env.PORT || 5000;
-const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+const HOST = process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost";
 
 // Start server
-const server = app.listen(PORT, HOST, () => {
+const server = app.listen(PORT, () => {
 	console.log(`🚀 College Notes Server is running on http://${HOST}:${PORT}`);
-	console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+	console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
 	console.log("\n📋 Available endpoints:");
 	console.log("  GET  / - Server status");
 	console.log("  POST /api/upload - Upload files to S3");
