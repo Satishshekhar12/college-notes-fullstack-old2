@@ -14,4 +14,9 @@ router.use("/api", fileRoutes);
 // Note routes (note management system)
 router.use("/api/notes", noteRoutes);
 
+// Express route to check server health
+router.get("/ping", (req, res) => {
+	res.status(200).send("pong");
+});
+
 export default router;
